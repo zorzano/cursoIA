@@ -1,20 +1,20 @@
 Base de datos de peticiones de tarjeta de credito
+Common Columns (Anonymized Version)
 
-CustomerID
-A1 Common Columns (Anonymized Version)
-A2 Gender: (Nominal) Gender of the applicant.
-A3 Age: (Continuous) Age of the applicant.
-A4 Debt: (Continuous) Outstanding debt.
-A5 Married: (Nominal) Marital status.
-A6 BankCustomer: (Nominal) Whether they are a bank customer.
-A7 EducationLevel: (Ordinal) Highest level of education.
-A8 Ethnicity: (Nominal) Ethnicity of the applicant.
-A9 YearsEmployed: (Continuous) Number of years employed.
-A10 PriorDefault: (Nominal) Whether they have a prior default.
+0 CustomerID
+1 Gender: (Nominal) Gender of the applicant. 1 Man 0 F
+2 Age: (Continuous) Age of the applicant.
+3 Debt: (Continuous) Outstanding debt. thousands of dollars
+4 Married: (Nominal) Marital status. 1 single 2 married
+A  BankCustomer: (Nominal) Whether they are a bank customer. ?
+A5 EducationLevel: (Ordinal) Highest level of education.
+A6 Ethnicity: (Nominal) Ethnicity of the applicant.
+A7 YearsEmployed: (Continuous) Number of years employed.
+A8 PriorDefault: (Nominal) Whether they have a prior default. 0/1
 A11 Employed: (Nominal) Whether they are employed.
-A12 CreditScore: (Continuous) Credit history score.
-A13 DriversLicense: (Nominal) Whether they hold a driver's license.
-A14 Citizen: (Nominal) Citizenship status.
-A15 ZipCode: (Continuous) Zip code of the applicant.
-A16 Income: (Continuous) Annual income.
-A17 ApprovalStatus: (Target Variable) Whether the app was approved (+ or -)
+A CreditScore: (Continuous) Credit history score.
+A12 DriversLicense: (Nominal) Whether they hold a driver's license.
+A13 Citizen: (Nominal) Citizenship status.
+A14 ZipCode: (Continuous) Zip code of the applicant.
+A Income: (Continuous) Annual income.
+Class ApprovalStatus: (Target Variable) Whether the app was approved (+ or -)
