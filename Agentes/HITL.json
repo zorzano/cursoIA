@@ -1,0 +1,282 @@
+{
+  "name": "HITL",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Peticion",
+        "formDescription": "Recepcion de datos",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Pon tu peticion. Recuerda poner tu nombre, correo electronico y numero de telefono"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -896,
+        -80
+      ],
+      "id": "c346fb55-3c36-4dd3-9b1f-a83b295c98f0",
+      "name": "On form submission",
+      "webhookId": "5f154bda-bcb1-4621-9273-2a63c2b4666b"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Tengo la siguiente peticion de un usuario. Necesito extraer de ella nombre de persona que lo pide, DNI, telefono, y la propia peticion. Por favor, damelo en este formato:\n- NOMBRE: xxxxx yyyyy\n- TELEFONO: nnnnnnnnn\n- DNI: mmmmmmmmmm\n- PETICION: fhdhsfhighfegfh\ncada item en una sola linea. No me des mas texto. Si alguno de los valores es erroneo o ausente dale el valor NULO. Esta es la peticion:\n {{ $json[\"Pon tu peticion. Recuerda poner tu nombre, correo electronico y numero de telefono\"] }}\n"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -688,
+        -80
+      ],
+      "id": "cd51ff22-d518-4ab4-a051-e74124170361",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "4ZIXKoqACSCvb9Yh",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "language": "pythonNative",
+        "pythonCode": "# Loop over input items and add a new field called 'my_new_field' to the JSON of each one\nllmtext=_items[0][\"json\"][\"output\"][0][\"content\"][0][\"text\"]\n\ncampos = {}\n\nfor linea in llmtext.split(\"\\n\"):\n    if \":\" in linea:\n        clave, valor = linea.split(\":\", 1)\n        clave = clave.replace(\"-\", \"\").strip()\n        valor = valor.strip()\n        campos[clave] = valor\n\nnombre=campos[\"NOMBRE\"]\ntelefono=campos[\"TELEFONO\"]\ndni=campos[\"DNI\"]\npeticion=campos[\"PETICION\"]\n\nfor item in _items:\n  item[\"json\"][\"nombre\"] = nombre\n  item[\"json\"][\"telefono\"] = telefono\n  item[\"json\"][\"dni\"] = dni\n  item[\"json\"][\"peticion\"] = peticion\n  \nreturn _items"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -336,
+        -80
+      ],
+      "id": "c42646f8-1399-43b4-92bf-043b91fde96e",
+      "name": "Code in Python"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "sendTo": "fjzorzano@gmail.com",
+        "subject": "Aprobacion requerida",
+        "message": "=Nombre:  {{ $json.nombre }}\nTelefono: {{ $json.telefono}}\nDNI: {{ $json.dni }}\nPeticion: {{ $json.peticion }}",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        -80
+      ],
+      "id": "4e3ce991-390f-4e19-af0d-8a7f42459eee",
+      "name": "Send message and wait for response",
+      "webhookId": "8398ea72-f997-46a9-ac1c-50a31368c4bb",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "EFpOdksfLAV0mV24",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1e6186b7-5a68-4f61-977e-ff8cfd3f6adf",
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        80,
+        -80
+      ],
+      "id": "6bc7422a-9355-4761-8339-dc2db85bd52d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "01z9tkjHnwej95Ou",
+          "mode": "list",
+          "cachedResultName": "Peticiones formulario",
+          "cachedResultUrl": "/projects/II1Ki1ZQ5CzjmcLl/datatables/01z9tkjHnwej95Ou"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Nombre": "={{ $('Code in Python').item.json.nombre }}",
+            "DNI": "={{ $('Code in Python').item.json.dni }}",
+            "Telefono": "={{ $('Code in Python').item.json.telefono }}",
+            "Peticion": "={{ $('Code in Python').item.json.peticion }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Nombre",
+              "displayName": "Nombre",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "DNI",
+              "displayName": "DNI",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Telefono",
+              "displayName": "Telefono",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Peticion",
+              "displayName": "Peticion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        288,
+        -176
+      ],
+      "id": "5500b511-5cd8-4849-96e8-d49f17f507f2",
+      "name": "Insert row"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code in Python",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in Python": {
+      "main": [
+        [
+          {
+            "node": "Send message and wait for response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message and wait for response": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "ecd8da5f-80e7-48c2-9c97-a26da8d4f5ae",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e3b516763ef92275f84e954c8fbe96f1e8c13f46fff80f82b106654168f86791"
+  },
+  "id": "d1akNy22g5DXKyjK",
+  "tags": []
+}

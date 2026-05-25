@@ -1,0 +1,117 @@
+{
+  "name": "Chiste",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "¡Cuentame un chiste!",
+        "formDescription": "Voy a contarte un chiste malo. Elige un tema.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Tema:",
+              "defaultValue": "Un perro que se llamaba \"mistetas\""
+            }
+          ]
+        },
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "3e8ef532-f416-43aa-9b2d-5ba542514c1e",
+      "name": "On form submission",
+      "webhookId": "9115a1ff-cd65-4a31-bab1-5e0513aeaf42"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Cuenta un chiste sobre este tema: {{ $json[\"Tema:\"] }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "3927d09d-aaa5-495e-8402-25f93391b202",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "4ZIXKoqACSCvb9Yh",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Este es tu chiste",
+        "completionMessage": "={{ $json.output[0].content[0].text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        560,
+        0
+      ],
+      "id": "5899f476-4d0e-44e3-9993-307a77560f25",
+      "name": "Form",
+      "webhookId": "9e63030f-9123-491d-83c6-1fcb4807576c"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "8c15b9d9-ea85-4113-9f36-fe6f92e5bccf",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e3b516763ef92275f84e954c8fbe96f1e8c13f46fff80f82b106654168f86791"
+  },
+  "id": "RdufNd0uRvmUT43w",
+  "tags": []
+}

@@ -1,0 +1,172 @@
+{
+  "name": "Clasificador correo",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "dc5da33c-53ff-4457-b850-d916341ed4db",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "kVRqHHsH9CjbcAqY",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=A continuacion te voy a copiar el texto de un correo que hemos recibido. Por favor, clasificalo respondiendome solo una de las siguientes palabras: spam, peticion, queja, felicitacion.\n\nEste es el texto del correo:\n{{ $json.text }}"
+            }
+          ]
+        },
+        "simplify": false,
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "53558511-457f-4931-b699-29ad12b679f3",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "4ZIXKoqACSCvb9Yh",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "N61l7GS8Cq02n2YD",
+          "mode": "list",
+          "cachedResultName": "Mensajes de correo",
+          "cachedResultUrl": "/projects/II1Ki1ZQ5CzjmcLl/datatables/N61l7GS8Cq02n2YD"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Tipo": "={{ $json.output[0].content[0].text }}",
+            "Origen": "={{ $('Gmail Trigger').item.json.headers.from }}",
+            "Texto": "={{ $('Gmail Trigger').item.json.text }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Tipo",
+              "displayName": "Tipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Texto",
+              "displayName": "Texto",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Origen",
+              "displayName": "Origen",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        560,
+        0
+      ],
+      "id": "a3d56f16-a541-4aa3-a04b-75516239f00c",
+      "name": "Insert row"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "3a070a64-ac54-471a-850b-0d010c1d8784",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e3b516763ef92275f84e954c8fbe96f1e8c13f46fff80f82b106654168f86791"
+  },
+  "id": "pdsT7jjMyQp2GwVt",
+  "tags": []
+}

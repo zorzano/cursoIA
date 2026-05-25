@@ -1,0 +1,184 @@
+{
+  "name": "RAG",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "RAG",
+        "formDescription": "Dime de que quieres que te hable",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "¿De que quieres saber?"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -640,
+        -80
+      ],
+      "id": "d38b2a83-27ce-4214-863b-f964115a14de",
+      "name": "On form submission",
+      "webhookId": "eebc7a16-54e0-4b7b-9865-57f240204756"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Un usuario me ha hecho esta pregunta: \n-----------\n{{ $json[\"¿De que quieres saber?\"] }}\n-----------\nDime una palabra que pueda buscar en wikipedia para obtener informacion util que te pueda servir. Respondeme solo con esa palabra, en ingles"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -432,
+        -80
+      ],
+      "id": "f8bcdcde-3d60-4333-9eb6-f354c4f4778b",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "4ZIXKoqACSCvb9Yh",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://api.dictionaryapi.dev/api/v2/entries/en/{{ $json.output[0].content[0].text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -80,
+        -80
+      ],
+      "id": "66e1e7c0-96a6-4da9-a3a6-04011e1cf60a",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Un usuario me ha hecho la siguiente pregunta:{{ $('On form submission').item.json[\"¿De que quieres saber?\"] }}\n\nPara poder responder tengo esta respuesta de un sistema automatico, creada en ingles, sobre el termino {{ $('Message a model').item.json.output[0].content[0].text }}:\n{{ $json.meanings }}\n\nDame una respuesta a la pregunta que me han hecho, que pueda entregar directamente.\n"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        128,
+        -80
+      ],
+      "id": "f1411d5f-f55b-45c5-afba-e592fc4658e9",
+      "name": "Message a model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "4ZIXKoqACSCvb9Yh",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "La respuesta es",
+        "completionMessage": "={{ $json.output[0].content[0].text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        480,
+        -80
+      ],
+      "id": "12a2f038-e59a-41c6-9346-fc5c69520d91",
+      "name": "Form",
+      "webhookId": "42235dae-9941-4595-910c-9b2962020d00"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "fc8baa2f-3dba-4970-97fb-3d207e759f77",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e3b516763ef92275f84e954c8fbe96f1e8c13f46fff80f82b106654168f86791"
+  },
+  "id": "H3LI47vyj6I5GBg9",
+  "tags": []
+}

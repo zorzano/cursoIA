@@ -1,0 +1,148 @@
+{
+  "name": "Hola Mundo",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Hola Mundo",
+        "formDescription": "Formulario de Hola Mundo",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "¿Que tal estas?",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Bien"
+                  },
+                  {
+                    "option": "Mal"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "1000349c-2461-499b-9c46-8203c3be9841",
+      "name": "On form submission",
+      "webhookId": "f3571d82-7312-43d3-b005-3d6ecf51fd3a"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ba53a299-f631-4ed5-a2ed-3f38f54f75ab",
+              "leftValue": "={{ $json[\"¿Que tal estas?\"] }}",
+              "rightValue": "Bien",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "7537648f-08c7-4190-b865-00afd5325168",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Siento mucho que estes mal",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        416,
+        96
+      ],
+      "id": "9a851b01-c8fc-47f6-b4e7-dfa721c12f0b",
+      "name": "Respuesta formulario. Mal.",
+      "webhookId": "1155948f-88b5-4454-8a15-1ebc8c72d3e7"
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "=Hola Mundo. estas {{ $json[\"¿Que tal estas?\"] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        400,
+        -80
+      ],
+      "id": "3b051b25-7b3a-4f48-99a7-215fd73baf33",
+      "name": "Respuesta Formulario. Bien.",
+      "webhookId": "03a19f18-5939-4b88-9fa8-9539d29d14c8"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Respuesta Formulario. Bien.",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respuesta formulario. Mal.",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "d52f7dc8-d78d-4413-bcdf-cdd1ef4a97c4",
+  "meta": {
+    "instanceId": "e3b516763ef92275f84e954c8fbe96f1e8c13f46fff80f82b106654168f86791"
+  },
+  "id": "jVcNRkuKkxolrwkx",
+  "tags": []
+}
